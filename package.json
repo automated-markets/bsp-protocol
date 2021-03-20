@@ -1,0 +1,38 @@
+{
+  "name": "bsp-protocol",
+  "version": "1.0.0",
+  "description": "Blockchain protocol for capturing, storing and tracking building safety records.",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx truffle compile",
+    "migrate": "npx truffle migrate --network development",
+    "start:blockchain": "npx ganache-cli --deterministic",
+    "exec:list_accounts": "npx truffle exec --network development ./scripts/list_accounts.js",
+    "exec:add_ews": "npx truffle exec --network development ./scripts/add_ews_survey.js",
+    "exec:verify_ews": "npx truffle exec --network development ./scripts/verify_ews_survey.js",
+    "test": "npx truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/automated-markets/bsp-protocol.git"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "built_asset_tracking"
+  ],
+  "author": "Sam Gamble, Automated Markets",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/automated-markets/bsp-protocol/issues"
+  },
+  "homepage": "https://github.com/automated-markets/bsp-protocol#readme",
+  "devDependencies": {
+    "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/test-environment": "^0.1.9",
+    "@openzeppelin/test-helpers": "^0.5.10",
+    "chai": "^4.3.4",
+    "ganache-cli": "^6.12.2",
+    "truffle": "^5.2.4"
+  }
+}
