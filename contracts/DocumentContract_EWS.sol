@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
-
 contract DocumentContract_EWS {
 
     struct BuildingData_EWS {
@@ -34,5 +33,4 @@ contract DocumentContract_EWS {
         BuildingData_EWS storage ewsSurvey = ewsSurveys[uprn];
         return ewsSurvey.documentHash == documentHash;
     }
-
 }
