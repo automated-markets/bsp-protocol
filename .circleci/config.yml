@@ -1,18 +1,19 @@
 version: 2.1
 jobs:
-  smart_contract:
+  build:
     docker:
       - image: circleci/node:12
-      - image: trufflesuite/ganache-cli
-        command: ganache-cli -i 1234 -e 100000000000 -l 4700038
-    working_directory: ~/repo
     steps:
       - checkout
-      - run:
-          name: npm install
-          command: |
-            npm install
-      - run:
-          name: Migrations Test
-          command: |
-              npm test
+      - run: npm install
+    docker:
+      - image: trufflesuite/ganache-cli
+        command: ganache-cli -i 1234 -e 100000000000 -l 4700038
+    steps:
+      - run: npm test
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+        - build
+        - test
