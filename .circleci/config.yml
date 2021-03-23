@@ -1,16 +1,22 @@
 version: 2.1
+
+orbs:
+  node: circleci/node@4.2.0
+
 jobs:
-  build_and_test:
+  test:
+    executor: node/default
     docker:
       - image: circleci/node:12
       - image: trufflesuite/ganache-cli
         command: ganache-cli -i 1234 -e 100000000000 -l 4700038
     steps:
       - checkout
-      - run: npm install
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
       - run: npm test
 workflows:
-  version: 2
   test_smart_contracts:
     jobs:
-        - build_and_test
+      - test
