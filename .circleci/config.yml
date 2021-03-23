@@ -1,16 +1,11 @@
 version: 2.1
-
-references:
-
-  container_config: &container_config
+jobs:
+  smart_contract:
     docker:
       - image: circleci/node:12
       - image: trufflesuite/ganache-cli
         command: ganache-cli -i 1234 -e 100000000000 -l 4700038
     working_directory: ~/repo
-
-  smart_contract: &smart_contract
-    <<: *container_config
     steps:
       - checkout
       - run:
@@ -21,12 +16,3 @@ references:
           name: Migrations Test
           command: |
               npm test
-jobs:
-  smart_contract:
-    <<: *smart_contract
-
-workflows:
-  smart_contract:
-    jobs:
-      - smart_contract:
-          context: Development
