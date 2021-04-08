@@ -1,3 +1,5 @@
+var Web3 = require('web3');
+
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -48,6 +50,26 @@ module.exports = {
       network_id: 1234,
       gas: 4700000,
       gasPrice: 20 * 1000000000
+    },
+    kaleido: {
+      provider: () => {
+        const AM_node = {
+          creds: 'e0p4igzwww:uCjZw59rHYuelOqHFAZvbAuwZBwO-xDFshVEQLiOO1o',
+          url: 'e0oldya6tm-e0iuoez1pb-rpc.de0-aws.kaleido.io/'
+        };
+        const SC_node = {
+          creds: 'e0pfai5ez5:YVTUzu7nUVG-_-ezdpIWKzrcpzDST_ZaHXnia0h4DoI',
+          url: 'e0oldya6tm-e0jnrxuxxx-rpc.de0-aws.kaleido.io/'
+        };
+
+        let connection = SC_node;
+                
+        return new Web3.providers.HttpProvider(`https://${connection.creds}@${connection.url}`, 100000);
+      },
+      network_id: "*", // Match any network id
+      gasPrice: 0,
+      gas: 4500000,
+      /* type: 'quorum' // Use this property for Quorum environments */
     },
     // Another network with more advanced options...
     // advanced: {

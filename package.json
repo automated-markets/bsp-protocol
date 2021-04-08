@@ -6,11 +6,13 @@
   "scripts": {
     "compile": "npx truffle compile",
     "migrate": "npx truffle migrate --network development",
+    "migrate:kaleido": "npx truffle migrate --network kaleido",
     "start:blockchain": "npx ganache-cli --deterministic",
     "exec:list_accounts": "npx truffle exec --network development ./scripts/list_accounts.js",
     "exec:add_ews": "npx truffle exec --network development ./scripts/add_ews_survey.js",
     "exec:verify_ews": "npx truffle exec --network development ./scripts/verify_ews_survey.js",
     "test": "npx truffle test",
+    "test:kaleido": "npx truffle test --network kaleido",
     "ganache": "node_modules/ganache-cli/cli.js -s 0 --port 8545 -i 1234 -e 100000000000 -l 4700038"
   },
   "repository": {
@@ -35,5 +37,6 @@
     "chai": "^4.3.4",
     "ganache-cli": "^6.12.2",
     "truffle": "^5.2.4"
-  }
+  },
+  "dependencies": {}
 }
