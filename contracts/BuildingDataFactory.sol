@@ -9,7 +9,7 @@
 //      BuildingDataFactory ---[contains many]---> Building ---[contains many]---> BuildingData
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity 0.8.3;
 
 contract Building {
     address owner; // TODO: use OpenZeppelin IOwnable
@@ -17,7 +17,7 @@ contract Building {
     bytes14 uprn;
     address[] allBuildingData;
 
-    constructor(address admin) public {
+    constructor(address admin) {
         factory = msg.sender;
         owner = admin;
     }
@@ -30,10 +30,23 @@ contract Building {
 }
 
 contract BuildingData {
-    address originator;
+    address owner; // TODO: use OpenZeppelin IOwnable
+    address factory;
+    address originator; // who provided the data
     string docType; // e.g. EWS, EWS1, HHSRS, Planning Application, S106 Agreement etc
     bytes32 docHash;
-    bytes12 uprn;
+    bytes14 uprn;
+
+    constructor(address admin) {
+        factory = msg.sender;
+        owner = admin;
+    }
+
+    // called once by the factory at time of deployment
+    function initialize(bytes14 _uprn) external {
+        require(msg.sender == factory, 'BSP: FORBIDDEN'); // sufficient check
+        uprn = _uprn;
+    }
 }
 
 contract BuildingDataFactory {
@@ -53,7 +66,7 @@ contract BuildingDataFactory {
 
 
     // Constructor
-    constructor(address admin) public {
+    constructor(address admin) {
         owner = admin;
     }
 
