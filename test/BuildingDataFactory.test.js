@@ -113,7 +113,7 @@ contract('BuildingDataFactory', function () {
             await buildingDataFactory.findOrCreateBuilding(web3.utils.asciiToHex(uprn));                
         }));
 
-        // check the building count is 5
+        // check the building count is 6
         const countOfBuildings = await buildingDataFactory.countOfBuildings();
         expect(countOfBuildings).to.be.bignumber.equal(new BN("6"));
     });
