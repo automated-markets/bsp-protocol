@@ -10,6 +10,9 @@ const {
 
 // Load compiled artifacts
 const BuildingDataFactory = artifacts.require("BuildingDataFactory");
+const Building = artifacts.require("Building");
+const BuildingData = artifacts.require("BuildingData");
+
 
 // Start test block
 contract('BuildingDataFactory', function () {
@@ -116,5 +119,36 @@ contract('BuildingDataFactory', function () {
         // check the building count is 6
         const countOfBuildings = await buildingDataFactory.countOfBuildings();
         expect(countOfBuildings).to.be.bignumber.equal(new BN("6"));
+    });
+
+    it('track an EWS1 survey and associate with a building', async function () {
+        const buildingDataFactory = this.BuildingDataFactory;
+        const uprn = "S217007860011";
+        const docHash = "a93f61faa647acf76eb042e57da25fff67c013cb60c231ab068afe6fe8ccdf4e";
+        const docType = "EWS1";
+
+
+        // register track the building data
+        await buildingDataFactory.trackBuildingData(
+            web3.utils.asciiToHex(uprn),
+            web3.utils.asciiToHex(docHash),
+            docType
+        );
+
+        // check there is only 1 build data contract tracked
+        let trackedBuildingDataAddress = await buildingDataFactory.buildingDataAddressByHash(web3.utils.asciiToHex(docHash));
+        let allBuildingDataAddresses = await buildingDataFactory.getAllBuildingData();
+        
+        expect(allBuildingDataAddresses).contains(trackedBuildingDataAddress);
+
+        // check the building data tracked in the building contract instance
+        let buildingContractAddress = await buildingDataFactory.buildingAddress(web3.utils.asciiToHex(uprn)); 
+        const buildingContract = await Building.at(buildingContractAddress);
+
+        let allBuildingData = await buildingContract.getAllBuildingData();
+
+        expect(allBuildingData).contains(trackedBuildingDataAddress);
+     
+
     });
 });

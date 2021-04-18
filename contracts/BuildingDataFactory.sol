@@ -1,13 +1,3 @@
-// Building Data Factory
-// Responsible for:
-//      - Creating new BuildingData contracts
-//      - Link BuildingData to Buildings
-//      - Track all Buildings
-//      - Tracking all BuildingData contracts, stored in a few ways 
-//        (by UPRN, by building data type - e.g. EWS1 survey)
-// Model:
-//      BuildingDataFactory ---[contains many]---> Building ---[contains many]---> BuildingData
-
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.3;
 
@@ -15,36 +5,51 @@ pragma solidity 0.8.3;
 import "./types/Building.sol";
 import "./types/BuildingData.sol";
 
+/// @title Building Data Factory
+/// @notice Responsible for tracking buildings and all types of data associated with each building
+/// @dev 
+///     Controls the creation of child contracts (Building and BuildingData)
+///     Tracks all addresses of the contracts created by this factory contract
+///     Data model is: BuildingDataFactory ---[contains many]---> Building ---[contains many]---> BuildingData
+/// @author Sam Gamble
 contract BuildingDataFactory {
     address owner; // TODO: use OpenZeppelin IOwnable
 
     // Data tracking
     address[] allBuildings; // track all Building contract instances
     address[] allBuildingData; // track all BuildingData contract instances
-    // mapping(bytes32 => address) buildingDataByDocHash;
     mapping(bytes14 => address) buildingByUPRN; // map UPRN to the address of the associated Building contract instance.
-    
-    // List all BuildingData contracts grouped by DocType
-    //mapping(docType => BuildingData) buildingDataByDocType;
-
-    // List all BuildingData contracts grouped by UPRN
-    //mapping(docType => BuildingData) buildingDataByDocType;
-
+    mapping(string => address) buildingDataByDocHash; // map document hash to the BuildingData a contract address
 
     // Constructor
     constructor(address admin) {
         owner = admin;
     }
 
-    // Functions
+    /// @notice Determines if a building is registered in this factory contract
+    /// @param uprn The UPRN to check
+    /// @return bool indicating whether the given UPRN is already registered on chain
     function isBuildingRegistered(bytes14 uprn) public view returns (bool) {
         return (buildingByUPRN[uprn] != address(0));
     }
 
+    /// @notice Finds the address of the Building contract instance that corresponds with the given UPRN
+    /// @param uprn The UPRN to find the corresponding Building contract for
+    /// @return The address of the Building contract associated with the given UPRN
     function buildingAddress(bytes14 uprn) public view returns (address) {
         return buildingByUPRN[uprn];
     }
 
+    /// @notice Finds the address of the BuildingDate contract instance that corresponds with the given document hash
+    /// @param documentHash The SHA256 hash of the document to find
+    /// @return The address of the BuildingDate contract
+    function buildingDataAddressByHash(string calldata documentHash) public view returns (address) {
+        return buildingDataByDocHash[documentHash];   
+    }
+
+    /// @notice Looks up the Building contract for a given UPRN. If the UPRN is not currently registered, a new Building contract is registered for the UPRN.
+    /// @param uprn The UPRN of the building to find
+    /// @return The address of the Building contract associated with the given UPRN
     function findOrCreateBuilding(bytes14 uprn) public returns (address) {
         // check if a Building contract exists with the same UPRN
         if(!isBuildingRegistered(uprn)) {
@@ -59,15 +64,14 @@ contract BuildingDataFactory {
         return buildingByUPRN[uprn];        
     }
 
-    // function notoriseBuildingData(bytes14 uprn, bytes32 documentHash, string docType) public returns (bool) {
-    //     // check for existing Building contract instance for the UPRN
-    //     address building = findOrCreateBuilding(uprn);
-    // }
-
+    /// @notice Counts all the registered buildings
+    /// @return The number of buildings registered
     function countOfBuildings() external view returns (uint) {
         return allBuildings.length;
     }
 
+    /// @notice Finds all of the buildings registered with this factory
+    /// @return _buildings All the on chain addresses of the registered building contracts
     function getAllBuildings() external view returns (address[] memory _buildings) {
        _buildings = new address[](allBuildings.length);
        uint count;
@@ -75,5 +79,38 @@ contract BuildingDataFactory {
             _buildings[count] = allBuildings[i];
             count++;
         }
-     }  
+    }  
+
+    /// @notice Finds all of the building data registered with this factory
+    /// @return _buildingData All the on chain addresses of the registered building data contracts
+    function getAllBuildingData() external view returns (address[] memory _buildingData) {
+       _buildingData = new address[](allBuildingData.length);
+       uint count;
+       for (uint i=0; i < allBuildingData.length; i++) {
+            _buildingData[count] = allBuildingData[i];
+            count++;
+        }
+    }  
+
+    /// @notice Tracks a element of building data against a building
+    /// @return The address of the BuildingData contract created
+    function trackBuildingData(bytes14 uprn, string calldata documentHash, string calldata docType) public returns (address){
+        // find or create the building 
+        address buildingContractAddress = findOrCreateBuilding(uprn);        
+        Building building = Building(buildingContractAddress);
+
+        // create a new BuildingData contract
+        BuildingData buildingData = new BuildingData(owner);
+        buildingData.initialize(buildingContractAddress, documentHash, docType);
+
+        // register the BuildingData in the Building contracxt
+        building.addBuildingData(buildingData); // track by building
+
+        address buildDateContractAddress = address(buildingData);
+        allBuildingData.push(buildDateContractAddress); // track all BuildingData contracts ever created
+        buildingDataByDocHash[documentHash] = buildDateContractAddress;
+
+        return buildDateContractAddress;
+    }
+
 }

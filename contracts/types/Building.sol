@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.3;
 
+import "./BuildingData.sol";
+
 contract Building {
     address owner; // TODO: use OpenZeppelin IOwnable
     address factory;
@@ -17,4 +19,19 @@ contract Building {
         require(msg.sender == factory, 'BSP: FORBIDDEN'); // sufficient check
         uprn = _uprn;
     }
+
+    function addBuildingData(BuildingData _buildingData) external {
+        allBuildingData.push(address(_buildingData));
+    }
+
+    /// @notice Retrieves all the building data registered with this building
+    /// @return _buildingData All the on chain addresses of the registered BuildingData contracts associated with this building
+    function getAllBuildingData() external view returns (address[] memory _buildingData) {
+       _buildingData = new address[](allBuildingData.length);
+       uint count;
+       for (uint i=0; i < allBuildingData.length; i++) {
+            _buildingData[count] = allBuildingData[i];
+            count++;
+        }
+    }  
 }

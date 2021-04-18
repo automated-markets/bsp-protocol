@@ -6,8 +6,8 @@ contract BuildingData {
     address factory;
     address originator; // who provided the data
     string docType; // e.g. EWS, EWS1, HHSRS, Planning Application, S106 Agreement, Section 235 notices etc...
-    bytes32 docHash;
-    bytes14 uprn;
+    string docHash;
+    address buildingContract;
 
     constructor(address admin) {
         factory = msg.sender;
@@ -15,8 +15,10 @@ contract BuildingData {
     }
 
     // called once by the factory at time of deployment
-    function initialize(bytes14 _uprn) external {
+    function initialize(address _building, string calldata _docHash, string calldata _docType) external {
         require(msg.sender == factory, 'BSP: FORBIDDEN'); // sufficient check
-        uprn = _uprn;
+        buildingContract = _building;
+        docType = _docType;
+        docHash = _docHash;
     }
 }
