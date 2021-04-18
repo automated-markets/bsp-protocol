@@ -70,8 +70,7 @@ contract('BuildingDataFactory', function () {
 
     });
 
-
-    it('check getAllBuildings returns the addresses of all the registered buildings', async function () {
+    it('check all addresses of Buildiong contracts can be retrieved', async function () {
         const buildingDataFactory = this.BuildingDataFactory;
         const uprnBuilding1 = "S217007860011";
         const uprnBuilding2 = "S217007860012";
@@ -100,5 +99,22 @@ contract('BuildingDataFactory', function () {
         expect(allBuildingAddresses).contains(addressBuilding3);
     });
 
-    
+    it('check Building contracts can be counted', async function () {
+        const buildingDataFactory = this.BuildingDataFactory;
+        const uprns = ["S217007860011", 
+                       "S217007860012", 
+                       "S217007860013", 
+                       "S217007860014", 
+                       "S217007860015", 
+                       "S217007860016"];
+         
+        // register the buildings in the factory contract
+        await Promise.all(uprns.map(async uprn => {
+            await buildingDataFactory.findOrCreateBuilding(web3.utils.asciiToHex(uprn));                
+        }));
+
+        // check the building count is 5
+        const countOfBuildings = await buildingDataFactory.countOfBuildings();
+        expect(countOfBuildings).to.be.bignumber.equal(new BN("6"));
+    });
 });
