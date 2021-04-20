@@ -1,3 +1,5 @@
+[![Automated Markets](https://circleci.com/gh/automated-markets/bsp-protocol.svg?style=svg)](https://circleci.com/gh/automated-markets/bsp-protocol)
+
 # BSP Protocol
 A blockchain protocol for capturing, recording and sharing building safety data.
 
@@ -19,7 +21,7 @@ etc...
 Initially, the organisations that would use the BSP Protocol are Building Owners (or agents that represent them), Councils and Central Government (e.g. MHCLG).
 
 * Building owners feed data into the system
-* Councils reads data about buildings within their jurisdiction
+* Councils read data about buildings within their jurisdiction
 * Central Government reads data about all buildings nationally 
 
 # Setup
