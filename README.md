@@ -28,11 +28,22 @@ Initially, the organisations that would use the BSP Protocol are Building Owners
 
 1. Install Node v12.*.*
 2. Install depenedencies: `npm i`
-3. Run tests - requires 2 terminal windows:
+3. Run tests - requires two terminal windows:
+
+## Test
 
 Terminal 1 `npm run start:blockchain`
 wait....
-Terminal 2 `npm test`
+Terminal 2:
+```bash
+# all tests (solidity, app and e2e)
+$ npm test
+```
+
+# Run app
+Requires two terminals - one for the local blockchain, one for the app
+Terminal 1 `npm run start:blockchain`
+Terminal 2 `npm run start`
 
 ## Tech stack
 
@@ -41,6 +52,7 @@ Terminal 2 `npm test`
 * Solidity v0.8.3 - smart contracts
 * Node v12.16.2 - to provide an API to the smart contracts
 * Web3.js v1.2.9 (need to upgrade to v1.3.5) - to interact with the smart contracts and sign transactions
+* Nestjs - API layer over the blockchain
 
 ### Dev deps
 * Ganache - a local blockchain used for local development and testing
