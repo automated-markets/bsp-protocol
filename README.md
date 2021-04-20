@@ -16,7 +16,7 @@ The types of information that will be tracked are as follows:
 etc... 
 
 ## Who is this for?
-Initially, the organisations that would use the BSP Protocol are Building Owners (or agents that represent them), Councils and Central Government (via MHCLG).
+Initially, the organisations that would use the BSP Protocol are Building Owners (or agents that represent them), Councils and Central Government (e.g. MHCLG).
 
 * Building owners feed data into the system
 * Councils reads data about buildings within their jurisdiction
@@ -26,7 +26,11 @@ Initially, the organisations that would use the BSP Protocol are Building Owners
 
 1. Install Node v12.*.*
 2. Install depenedencies: `npm i`
-3. Run tests: `npm test`
+3. Run tests - requires 2 terminal windows:
+
+Terminal 1 `npm run start:blockchain`
+wait....
+Terminal 2 `npm test`
 
 ## Tech stack
 
