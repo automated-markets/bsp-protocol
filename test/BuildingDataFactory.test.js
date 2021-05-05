@@ -148,7 +148,5 @@ contract('BuildingDataFactory', function () {
         let allBuildingData = await buildingContract.getAllBuildingData();
 
         expect(allBuildingData).contains(trackedBuildingDataAddress);
-     
-
     });
 });

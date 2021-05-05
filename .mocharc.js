@@ -8,5 +8,5 @@ module.exports = {
   extension: ['js'],
   ignore: ['app.e2e-spec.ts'],
   spec: ['test/**/*.test.js'], // the positional arguments!
-  timeout: '2000'
+  timeout: '2000', // same as 
 };

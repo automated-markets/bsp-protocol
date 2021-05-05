@@ -20,7 +20,7 @@ contract BuildingDataFactory {
     address[] allBuildingData; // track all BuildingData contract instances
     mapping(bytes14 => address) buildingByUPRN; // map UPRN to the address of the associated Building contract instance.
     mapping(string => address) buildingDataByDocHash; // map document hash to the BuildingData a contract address
-
+    
     // Constructor
     constructor(address admin) {
         owner = admin;
@@ -99,18 +99,23 @@ contract BuildingDataFactory {
         address buildingContractAddress = findOrCreateBuilding(uprn);        
         Building building = Building(buildingContractAddress);
 
-        // create a new BuildingData contract
-        BuildingData buildingData = new BuildingData(owner);
-        buildingData.initialize(buildingContractAddress, documentHash, docType);
+        if ( buildingDataByDocHash[documentHash] != address(0) ) {
+            // doc hash already registered, return address of corresponding building data contract instance
+            return buildingDataByDocHash[documentHash];
+        } else {
+            // doc hash never registered before, so create a new BuildingData contract
+            BuildingData buildingData = new BuildingData(owner);
+            buildingData.initialize(buildingContractAddress, documentHash, docType);
 
-        // register the BuildingData in the Building contracxt
-        building.addBuildingData(buildingData); // track by building
+            // register the BuildingData in the Building contracxt
+            building.addBuildingData(buildingData); // track by building
 
-        address buildDateContractAddress = address(buildingData);
-        allBuildingData.push(buildDateContractAddress); // track all BuildingData contracts ever created
-        buildingDataByDocHash[documentHash] = buildDateContractAddress;
+            address buildDataContractAddress = address(buildingData);
+            allBuildingData.push(buildDataContractAddress); // track all BuildingData contracts ever created
+            buildingDataByDocHash[documentHash] = buildDataContractAddress;
 
-        return buildDateContractAddress;
+            return buildDataContractAddress;
+        }
     }
 
 }

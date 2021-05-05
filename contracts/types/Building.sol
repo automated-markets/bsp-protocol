@@ -34,4 +34,10 @@ contract Building {
             count++;
         }
     }  
+
+    /// @notice Reads all of the building  fields
+    /// @return UPRN
+    function show() external view returns (bytes14) {
+        return uprn;
+    }
 }

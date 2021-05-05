@@ -32,11 +32,13 @@ Initially, the organisations that would use the BSP Protocol are Building Owners
 
 ## Test
 
-Terminal 1 `npm run start:blockchain`
-wait....
-Terminal 2:
 ```bash
-# all tests (solidity, app and e2e)
+// Terminal 1 - start development blockchain
+npm run start:blockchain
+```
+
+```bash
+// Terminal 2
 $ npm test
 ```
 

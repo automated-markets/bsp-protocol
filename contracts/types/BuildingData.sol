@@ -9,6 +9,13 @@ contract BuildingData {
     string docHash;
     address buildingContract;
 
+    struct buildingData {
+        address originator; // who provided the data
+        string docType; // e.g. EWS, EWS1, HHSRS, Planning Application, S106 Agreement, Section 235 notices etc...
+        string docHash;
+        address buildingContract;
+    }
+
     constructor(address admin) {
         factory = msg.sender;
         owner = admin;
@@ -20,5 +27,10 @@ contract BuildingData {
         buildingContract = _building;
         docType = _docType;
         docHash = _docHash;
+    }
+
+    // reads all of the building data fields
+    function show() external view returns (string memory, string memory, address, address) {
+        return (docHash, docType, originator, buildingContract);
     }
 }
