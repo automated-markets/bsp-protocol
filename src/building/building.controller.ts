@@ -6,8 +6,13 @@ export class BuildingController {
     
     constructor(private readonly buildingService: BuildingService) { }
 
-    @Get('/all')
+    @Get()
     async all() {
         return await this.buildingService.listAll();
+    }
+
+    @Get(':uprn')
+    async findOne(@Param() params) {
+        return await this.buildingService.get(params.uprn)
     }
 }

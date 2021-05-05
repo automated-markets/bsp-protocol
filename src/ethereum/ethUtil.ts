@@ -64,6 +64,10 @@ class EthUtil {
         return this.web3.utils.hexToAscii(s);
     }
 
+    toUtf8(s: string): string {
+        return this.web3.utils.hexToUtf8(s);
+    }
+
     async getFactoryContract() : Promise<any> {
         if(this.factoryContractInstance === undefined) {
             this.factoryContractInstance = await this.factoryContract.at(this.factoryAddress);
@@ -85,17 +89,24 @@ class EthUtil {
 
         // unpack solidity response into a typed DTO
         const buildingData = new BuildingDataDto();
-        buildingData.documentHash = buildingDataItem["0"];
+        buildingData.documentHash = this.toUtf8(buildingDataItem["0"]);
         buildingData.documentType = buildingDataItem["1"];
         buildingData.dataOriginator = buildingDataItem["2"];
+        buildingData.uri = "https://gateway.pinata.cloud/ipfs/" + this.toUtf8(buildingDataItem["0"]);
 
         return buildingData;
     }
 
-    async getBuildingDataForBuildingByAddress(address: string): Promise<BuildingDto> { 
+    async getBuildingByUprn(uprn: string): Promise<BuildingDto> {
+        const instance = await this.getFactoryContract();
+        const buildingAddress = await instance.buildingAddress(this.toHex(uprn));
+        return this.getBuildingByAddress(buildingAddress);
+    }
+
+    async getBuildingByAddress(address: string): Promise<BuildingDto> { 
         const buildingContract = await this.buildingContract.at(address);
         const uprnHex = await buildingContract.show();
-        const uprn = this.toAscii(uprnHex);
+        const uprn = this.toUtf8(uprnHex);
         const buildingDataAddresses =  await buildingContract.getAllBuildingData();
         const promises: Array<Promise<BuildingDataDto>> = buildingDataAddresses.map(buildingDataAddress => this.showBuildingData(buildingDataAddress) )
         const buildingData = await Promise.all(promises);

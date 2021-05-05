@@ -1,19 +1,19 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import EthUtil from '../ethereum/ethUtil'
 import { NotoriseSurveyDto } from './dto/notorise-survey.dto';
-import * as crypto from "crypto";
 import { BuildingDataDto } from 'src/dto';
+import StorageService  from './storage.service';
 
 @Injectable()
 export class SurveyService {
 
     async notarise(notoriseSurveyDto: NotoriseSurveyDto): Promise<BuildingDataDto> {
-        const { uprn, buildingId, survey, surveyType } = notoriseSurveyDto;
-        const surveyString = JSON.stringify(survey);
-        const docHash = crypto.createHash('sha256').update(surveyString).digest('base64');
-        
+        const { uprn, buildingId, surveyType } = notoriseSurveyDto;
+
         try {
-            const res = await EthUtil.trackBuildingData(buildingId, uprn, docHash, surveyType)
+            // save survey to IPFS
+            const saveRes = await StorageService.save(notoriseSurveyDto);            
+            const res = await EthUtil.trackBuildingData(buildingId, uprn, saveRes.IpfsHash, surveyType)
             
             return res;
         } catch (error) {
