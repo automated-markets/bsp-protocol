@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import EthUtil from '../config/ethUtil'
+import EthUtil from '../ethereum/ethUtil'
 import { NotoriseSurveyDto } from './dto/notorise-survey.dto';
 import * as crypto from "crypto";
 import { BuildingDataDto } from 'src/dto';

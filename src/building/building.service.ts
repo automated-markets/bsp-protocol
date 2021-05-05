@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import EthUtil from '../config/ethUtil';
+import EthUtil from '../ethereum/ethUtil';
 import { BuildingDto } from '../dto/building-dto';
 
 @Injectable()
