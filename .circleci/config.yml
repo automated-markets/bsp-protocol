@@ -16,11 +16,11 @@ jobs:
           cache-path: ~/project/node_modules
           override-ci-command: npm install
       - run: 
-        name: Run all tests
-        command: npm test
-        environment:
-          ETH_HOST: http://127.0.0.1:8545
-          ETH_FACTORY_ADDRESS: 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
+          name: Run all tests
+          command: npm test
+          environment:
+            ETH_HOST: http://127.0.0.1:8545
+            ETH_FACTORY_ADDRESS: 0xCfEB869F69431e42cdB54A4F4f105C19C080A601
 
 workflows:
   test_smart_contracts:
