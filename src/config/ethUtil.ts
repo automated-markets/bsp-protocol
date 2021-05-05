@@ -4,6 +4,7 @@ import * as buildingDataFactoryArtifact from '../../build/contracts/BuildingData
 import * as buildingArtifact from '../../build/contracts/Building.json';
 import * as buildingDataArtifact from '../../build/contracts/BuildingData.json';
 const Web3 = require('web3')
+import { BuildingDto, BuildingDataDto } from '../dto';
 
 const networkUrl = 'http://127.0.0.1:8545';
 const factoryAddress = "0xcfeb869f69431e42cdb54a4f4f105c19c080a601";
@@ -56,9 +57,12 @@ class EthUtil {
         return this.web3.utils.asciiToHex(s);
     }
 
+    toAscii(s: string): string {
+        return this.web3.utils.hexToAscii(s);
+    }
+
     async getFactoryContract() : Promise<any> {
         if(this.factoryContractInstance === undefined) {
-            console.log("Finding the BuildingDataFactory contract at: " + this.factoryAddress);
             this.factoryContractInstance = await this.factoryContract.at(this.factoryAddress);
         }
         return this.factoryContractInstance;
@@ -72,34 +76,53 @@ class EthUtil {
         return await this.buildingContract.at(address);
     }
 
-    async showBuildingData(address: string): Promise<any> {
+    async showBuildingData(address: string): Promise<BuildingDataDto> {
         const instance = await this.buildingDataContract.at(address);
-        return await instance.show();
+        const buildingDataItem = await instance.show();
+
+        // unpack solidity response into a typed DTO
+        const buildingData = new BuildingDataDto();
+        buildingData.documentHash = buildingDataItem["0"];
+        buildingData.documentType = buildingDataItem["1"];
+        buildingData.dataOriginator = buildingDataItem["2"];
+
+        return buildingData;
     }
 
-    async getBuildingDataForBuildingByAddress(address: string): Promise<any> { 
+    async getBuildingDataForBuildingByAddress(address: string): Promise<BuildingDto> { 
         const buildingContract = await this.buildingContract.at(address);
-        const uprn = await buildingContract.show();
+        const uprnHex = await buildingContract.show();
+        const uprn = this.toAscii(uprnHex);
         const buildingDataAddresses =  await buildingContract.getAllBuildingData();
-        const buildingData = await Promise.all(buildingDataAddresses.map(buildingDataAddress => this.showBuildingData(buildingDataAddress) ));
-        // unpack solidity response into a plain old object
-        const buildingDataObjs = buildingData.map(buildingDataItem => {
-            return {
-                documentHash: buildingDataItem["0"],
-                documentType: buildingDataItem["1"],
-                dataOriginator: buildingDataItem["2"]
-            };
-        })
+        const promises: Array<Promise<BuildingDataDto>> = buildingDataAddresses.map(buildingDataAddress => this.showBuildingData(buildingDataAddress) )
+        const buildingData = await Promise.all(promises);
+        
+        const building = new BuildingDto()
+        building.buildingAddr = address;
+        building.buildingData = buildingData;
+        building.uprn = uprn;
 
-        return {
-            uprn,
-            buildingAddr: address,
-            buildingData: buildingDataObjs
-        };
+        return building;
     }
 
-    async getBuildDataAtAddress(address: string): Promise<any> { 
+    async getBuildingDataAtAddress(address: string): Promise<any> { 
         return await this.buildingDataContract.at(address);
+    }
+
+    async trackBuildingData(buildingId: string, uprn: string, documentHash: string, documentType: string) : Promise<BuildingDataDto> {
+        const instance = await this.getFactoryContract();
+        const fromAddress = this.buildingIdToAddress(buildingId)
+        
+        const res = await instance.trackBuildingData(
+            this.toHex(uprn),
+            this.toHex(documentHash),
+            documentType,
+            { from: fromAddress }
+        );
+        
+        const trackedBuildingDataAddress = await instance.buildingDataAddressByHash(this.toHex(documentHash));
+
+        return await this.showBuildingData(trackedBuildingDataAddress);
     }
 
 }

@@ -22,11 +22,12 @@ contract BuildingData {
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _building, string calldata _docHash, string calldata _docType) external {
+    function initialize(address _building, string calldata _docHash, string calldata _docType, address _originator) external {
         require(msg.sender == factory, 'BSP: FORBIDDEN'); // sufficient check
         buildingContract = _building;
         docType = _docType;
         docHash = _docHash;
+        originator = _originator;
     }
 
     // reads all of the building data fields

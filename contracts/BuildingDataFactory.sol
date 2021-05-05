@@ -98,6 +98,7 @@ contract BuildingDataFactory {
         // find or create the building 
         address buildingContractAddress = findOrCreateBuilding(uprn);        
         Building building = Building(buildingContractAddress);
+        address originator = msg.sender;
 
         if ( buildingDataByDocHash[documentHash] != address(0) ) {
             // doc hash already registered, return address of corresponding building data contract instance
@@ -105,7 +106,7 @@ contract BuildingDataFactory {
         } else {
             // doc hash never registered before, so create a new BuildingData contract
             BuildingData buildingData = new BuildingData(owner);
-            buildingData.initialize(buildingContractAddress, documentHash, docType);
+            buildingData.initialize(buildingContractAddress, documentHash, docType, originator);
 
             // register the BuildingData in the Building contracxt
             building.addBuildingData(buildingData); // track by building

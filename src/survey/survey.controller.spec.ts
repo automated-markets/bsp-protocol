@@ -27,7 +27,10 @@ describe('SurveyController', () => {
 
       const res = await appController.notarise(notoriseSurveyDto);
 
-      expect(res).toBe('This action adds a new survey');
+      expect(res.dataOriginator).toBe("0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1");
+      expect(res.documentHash).toBe("0x49354f636c497568392b496b43615979506a6c425655796b6e2b47556739545472642b72447a49345630303d");
+      expect(res.documentType).toBe(notoriseSurveyDto.surveyType);
+
     });
   });
 });
