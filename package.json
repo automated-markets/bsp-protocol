@@ -16,7 +16,7 @@
     "test:blockchain": "npx truffle test ./test/BuildingDataFactory.test.js",
     "test:app": "jest",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test": "npm run migrate && npm run exec:fund_accounts && npm run test:blockchain && npm run test:app && npm run test:e2e",
+    "test": "npm run migrate && npm run exec:fund_accounts && npm run test:blockchain && npm run test:app",
     "test:kaleido": "npx truffle test --network kaleido",
     "ganache": "node_modules/ganache-cli/cli.js -s 0 --port 8545 -i 1234 -e 100000000000 -l 4700038"
   },
