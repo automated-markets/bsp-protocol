@@ -28,7 +28,7 @@ describe('SurveyController', () => {
 
             const res = await appController.notarise(notoriseSurveyDto);
 
-            expect(res.dataOriginator).toBe("0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1");
+            expect(res.dataOriginator).toBe("0xde9cAd5fe929B2Bc702494E6f7219B520ae1350E");
             expect(res.documentHash).toBe("QmZhgtoSCRqD6cQQTQE1AEV7AaiA9gHT3FEuCwhhp6Ptnx");
             expect(res.documentType).toBe(notoriseSurveyDto.surveyType);
         });

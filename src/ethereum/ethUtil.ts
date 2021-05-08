@@ -4,6 +4,7 @@ import * as buildingDataFactoryArtifact from '../../build/contracts/BuildingData
 import * as buildingArtifact from '../../build/contracts/Building.json';
 import * as buildingDataArtifact from '../../build/contracts/BuildingData.json';
 const Web3 = require('web3')
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 import { BuildingDto, BuildingDataDto } from '../dto';
 
 // Load environment variables from .env file
@@ -11,22 +12,25 @@ dotenv.config();
 
 const networkUrl = process.env.ETH_HOST;
 const factoryAddress = process.env.ETH_FACTORY_ADDRESS;
+const chainId = process.env.ETH_CHAIN_ID;
 
-/*
-Map of organisation to wallet address
-----------
-0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 (100 ETH)
-0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0 (100 ETH)
-0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b (100 ETH)
-0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d (100 ETH)
-0xd03ea8624C8C5987235048901fB614fDcA89b117 (100 ETH)
-0x95cED938F7991cd0dFcb48F0a06a40FA1aF46EBC (100 ETH)
-0x3E5e9111Ae8eB78Fe1CC3bb8915d5D461F3Ef9A9 (100 ETH)
-0x28a8746e75304c0780E011BEd21C72cD78cd535E (100 ETH)
-0xACa94ef8bD5ffEE41947b4585a84BdA5a3d3DA6E (100 ETH)
-0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e (100 ETH)
+class KnownAccount {
 
-*/
+    web3: any;
+
+    constructor(_mnemonic: string){    
+        this.web3 = new Web3(new HDWalletProvider({
+            mnemonic: _mnemonic,
+            providerOrUrl: networkUrl,
+            addressIndex: 0,
+            chainId: chainId
+          }));
+    }
+
+    getAddress(): string {
+        return this.web3.currentProvider.addresses[0];
+    }
+}
 
 class EthUtil {
     factoryAddress: string;
@@ -36,11 +40,27 @@ class EthUtil {
     factoryContractInstance!: any;
     buildingContract: any;
     buildingDataContract: any;
+    knownAccounts: Map<string, KnownAccount>;
 
     constructor(networkUrl: string, factoryContractAddress: string) {
         this.factoryAddress = factoryContractAddress;
         this.provider = networkUrl;
-        this.web3 = new Web3(new Web3.providers.HttpProvider(networkUrl));
+
+        this.knownAccounts = new Map<string, KnownAccount>([
+            ["PEABODY_TRUST", new KnownAccount(process.env.ETH_KNOWN_ADDRESS_PEABODY_TRUST)],
+            ["SOUTHWARK_COUNCIL", new KnownAccount(process.env.ETH_KNOWN_ADDRESS_SOUTHWARK_COUNCIL)],
+            ["MHCLG", new KnownAccount(process.env.ETH_KNOWN_ADDRESS_MHCLG)]
+        ]);
+        
+        console.log('--- Accounts ----------------------------------------------------------');
+        console.log(`MHCLG:                 ${this.knownAccounts.get("MHCLG").getAddress()}`);
+        console.log(`SOUTHWARK COUNCIL:     ${this.knownAccounts.get("SOUTHWARK_COUNCIL").getAddress()}`);
+        console.log(`PEABODY TRUST:         ${this.knownAccounts.get("PEABODY_TRUST").getAddress()}`);
+        console.log('-----------------------------------------------------------------------')
+        console.log('');
+        
+        // set the default signing account to be Southwark Council
+        this.web3 = this.knownAccounts.get("SOUTHWARK_COUNCIL").web3;
         
         // set up contracts...
         const buildingDataFactory = contract(buildingDataFactoryArtifact);
@@ -74,10 +94,6 @@ class EthUtil {
         }
         return this.factoryContractInstance;
     }
-    
-    buildingIdToAddress(buildingId: string) : string {
-        return "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1";
-    }
 
     async getBuildingAtAddress(address: string): Promise<any> { 
         return await this.buildingContract.at(address);
@@ -92,7 +108,7 @@ class EthUtil {
         buildingData.documentHash = this.toUtf8(buildingDataItem["0"]);
         buildingData.documentType = buildingDataItem["1"];
         buildingData.dataOriginator = buildingDataItem["2"];
-        buildingData.uri = "https://gateway.pinata.cloud/ipfs/" + this.toUtf8(buildingDataItem["0"]);
+        buildingData.uri = `${process.env.PINATA_GATEWAY_BASE_URL}/${this.toUtf8(buildingDataItem["0"])}`;
 
         return buildingData;
     }
@@ -125,18 +141,30 @@ class EthUtil {
 
     async trackBuildingData(buildingId: string, uprn: string, documentHash: string, documentType: string) : Promise<BuildingDataDto> {
         const instance = await this.getFactoryContract();
-        const fromAddress = this.buildingIdToAddress(buildingId)
+
+        this.factoryContract.setProvider(this.knownAccounts.get("PEABODY_TRUST").web3.currentProvider);
+
+        // map building ID to a known account
+        const fromAddress = this.knownAccounts.get("PEABODY_TRUST").web3.currentProvider.addresses[0];
         
+        console.log("trackBuildingData")
+        console.log("\tUPRN: " + uprn)
         const res = await instance.trackBuildingData(
             this.toHex(uprn),
             this.toHex(documentHash),
             documentType,
             { from: fromAddress }
         );
-        
-        const trackedBuildingDataAddress = await instance.buildingDataAddressByHash(this.toHex(documentHash));
+        if(res.receipt.name === 'Error') 
+            throw new Error(res.receipt.stack)
 
-        return await this.showBuildingData(trackedBuildingDataAddress);
+        console.log("buildingDataAddressByHash")
+        const trackedBuildingDataAddress = await instance.buildingDataAddressByHash(this.toHex(documentHash));
+        console.log(`\taddress: ${trackedBuildingDataAddress}`);
+        let response = await this.showBuildingData(trackedBuildingDataAddress);
+
+        this.factoryContract.setProvider(this.knownAccounts.get("SOUTHWARK_COUNCIL").web3.currentProvider);
+        return response;
     }
 
 }
