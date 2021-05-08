@@ -1,8 +1,8 @@
 const Web3 = require('web3');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
-import * as dotenv from 'dotenv';
-dotenv.config();
+const dotenv = require('dotenv');
 
+dotenv.config();
 const alchemyApiKey = process.env.ETH_ALCHEMY_API_KEY;
 const mnemonicPhrase = process.env.ETH_KNOWN_ADDRESS_SOUTHWARK_COUNCIL
 
