@@ -28,9 +28,16 @@ Initially, the organisations that would use the BSP Protocol are Building Owners
 
 1. Install Node v12.*.*
 2. Install depenedencies: `npm i`
-3. Run tests - requires two terminal windows:
+3. Create your own .env file, using the .env.template as a template:
+4. Create a Pinata IPFS account and use the creds to set the PINATA_* settings in your .env file: https://pinata.cloud
+5. Create new mnemonics to set the value for the ETH_KNOWN_ADDRESS_* settings in your .env file:
+```bash
+npx mnemonic
+```
 
 ## Test
+
+Running the tests requires two terminal windows:
 
 ```bash
 // Terminal 1 - start development blockchain
@@ -44,8 +51,21 @@ $ npm test
 
 # Run app
 Requires two terminals - one for the local blockchain, one for the app
-Terminal 1 `npm run start:blockchain`
-Terminal 2 `npm run start`
+
+* Terminal 1:
+```bash
+npm run start:blockchain
+```
+* Terminal 2:
+```bash
+npm run start
+```
+
+Alternatively you can run the Ganache UI as your local Ethereum blockchain, so then you will only need to run the Node app:
+```bash
+npm run start
+```
+N.B. make sure the connection settings in the truffle-config.js point to your local Ganache UI blockchain, usually on port 7545 instead of 8545.
 
 ## Tech stack
 
