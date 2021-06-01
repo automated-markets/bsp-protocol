@@ -81,7 +81,18 @@ N.B. make sure the connection settings in the truffle-config.js point to your lo
 * Truffle - used to manage and test smart contracts
 
 ## How does it work?
-TODO...
+Take a look at the one-page overview here: https://github.com/automated-markets/bsp-protocol/blob/main/docs/Building%20Passport%20Service%20-%20overview.pdf
+
+This version of the BSP Protocol uses a simplified process:
+
+1. Upload document to associate with UPRN
+2. Store document in IPFS
+3. Create a new smart contract to conatain the hash of the document, digitally signed by the originator of the document
+4. Link the smart contract created in step 3 to the UPRN in a building registry smart contract
+
+The result: for a given UPRN you get an audit trail of all the documents associated with it
+
+Each document is digitally signed and tiimestamped, allowing a timeline to be built up showing who provided each piece of information and when.
 
 ## How are the smart contracts structured?
 Based on the Factory model used by Uniswap. The Factory contract is the only way to create instances of the Building contract and BuildingData contract. The Factory keeps a track of the instances of the Building and BuildingData contracts and provides utility functions to look up the contract instances by UPRN or type of BuildingData.
