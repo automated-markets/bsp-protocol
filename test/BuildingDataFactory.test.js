@@ -126,13 +126,14 @@ contract('BuildingDataFactory', function () {
         const uprn = "S217007860011";
         const docHash = "a93f61faa647acf76eb042e57da25fff67c013cb60c231ab068afe6fe8ccdf4e";
         const docType = "EWS1";
-
+        const timestamp = "2021-05-12T11:42:08+0000" // ISO 8061 format
 
         // register track the building data
         await buildingDataFactory.trackBuildingData(
             web3.utils.asciiToHex(uprn),
             web3.utils.asciiToHex(docHash),
-            docType
+            docType,
+            timestamp
         );
 
         // check there is only 1 build data contract tracked

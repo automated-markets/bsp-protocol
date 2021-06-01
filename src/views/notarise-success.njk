@@ -1,0 +1,124 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block head %}
+    <link href="/assets/css/govuk-frontend-3.11.0.min.css" rel="stylesheet">
+    <style>
+      .red {
+        color: red;
+      }
+
+      .green {
+        color: green;
+      }
+
+      .centre {
+        display: block;
+        width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .grey {
+        background-color: #f3f2f1;
+      }
+
+      .padding30 {
+        padding: 30px 0px 10px;
+      }
+    </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    serviceName: "Building Passport Service",
+    serviceUrl: "#"
+  }) }}
+{% endblock %}
+
+{% block pageTitle %}GOV.UK - Building Passport Service{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: "experimental"
+    },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {% set url1 = '/ui/building/' + uprn %}
+  {% set url2 = '/ui/notarise/' + uprn %}
+
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Home",
+        href: "/ui/search"
+      },
+      {
+        text: "Buildings",
+        href: "/ui/search"
+      },
+      {
+        text: uprn,
+        href: url1
+      },
+      {
+        text: "Register survey",
+        href: url2
+      },
+      {
+        text: "Success"
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% set refHtml = 'Document fingerprint<p class="govuk-body-s" style="color: white;"><br/><strong>' + fingerprint + '</strong></p>' %}
+
+      {{ govukPanel({
+        titleText: "Survey registration complete",
+        html: refHtml
+      }) }}
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">We have sent you a confirmation email.</p>
+
+      <h2 class="govuk-heading-m">What happens next</h2>
+
+      <p class="govuk-body">
+        We’ve sent your application to be validated by the Building Safety Team at Southwark Council.
+      </p>
+      <p class="govuk-body">
+        They will contact you either to confirm your registration, or to ask for more information.
+      </p>
+
+      <p class="govuk-body">
+        <a href="#" class="govuk-link">What did you think of this service?</a> (takes 30 seconds)
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
+  <script src="/assets/js/govuk-frontend-3.11.0.min.js"></script>
+  <script>window.GOVUKFrontend.initAll()</script>
+{% endblock %}

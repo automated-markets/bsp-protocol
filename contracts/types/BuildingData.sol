@@ -7,14 +7,8 @@ contract BuildingData {
     address originator; // who provided the data
     string docType; // e.g. EWS, EWS1, HHSRS, Planning Application, S106 Agreement, Section 235 notices etc...
     string docHash;
+    string timestamp;
     address buildingContract;
-
-    struct buildingData {
-        address originator; // who provided the data
-        string docType; // e.g. EWS, EWS1, HHSRS, Planning Application, S106 Agreement, Section 235 notices etc...
-        string docHash;
-        address buildingContract;
-    }
 
     constructor(address admin) {
         factory = msg.sender;
@@ -22,16 +16,17 @@ contract BuildingData {
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _building, string calldata _docHash, string calldata _docType, address _originator) external {
+    function initialize(address _building, string calldata _docHash, string calldata _docType, string calldata _timestamp, address _originator) external {
         require(msg.sender == factory, 'BSP: FORBIDDEN'); // sufficient check
         buildingContract = _building;
         docType = _docType;
         docHash = _docHash;
         originator = _originator;
+        timestamp = _timestamp;
     }
 
     // reads all of the building data fields
-    function show() external view returns (string memory, string memory, address, address) {
-        return (docHash, docType, originator, buildingContract);
+    function show() external view returns (string memory, string memory, string memory, address, address) {
+        return (docHash, docType, timestamp, originator, buildingContract);
     }
 }

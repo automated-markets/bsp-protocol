@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SurveyController } from './survey.controller';
 import { SurveyService } from './survey.service';
-import { NotoriseSurveyDto } from './dto/notorise-survey.dto';
-
+import { NotariseSurveyDto } from './dto/notarise-survey.dto';
 
 describe('SurveyController', () => {
     let app: TestingModule;
@@ -15,26 +14,23 @@ describe('SurveyController', () => {
         }).compile();
     });
 
-    describe('notorise', () => {
+    describe('notarise', () => {
 
         it('should return "This action adds a new survey"', async () => {
             const appController = app.get<SurveyController>(SurveyController);
-            const notoriseSurveyDto = new NotoriseSurveyDto();
+            const notoriseSurveyDto = new NotariseSurveyDto();
 
-            notoriseSurveyDto.buildingId = "90F8bf6A479f320";
+            notoriseSurveyDto.originatorAddress = "0x55a401d54532c7a56cd0c1497a190e767a756a18";
             notoriseSurveyDto.survey = { key: "survey data here" };
             notoriseSurveyDto.uprn = "S217007860011";
             notoriseSurveyDto.surveyType = "EWS";
 
             const res = await appController.notarise(notoriseSurveyDto);
 
-            expect(res.dataOriginator).toBe("0xde9cAd5fe929B2Bc702494E6f7219B520ae1350E");
+            expect(res.dataOriginator.toLowerCase()).toBe(notoriseSurveyDto.originatorAddress);
             expect(res.documentHash).toBe("QmZhgtoSCRqD6cQQTQE1AEV7AaiA9gHT3FEuCwhhp6Ptnx");
             expect(res.documentType).toBe(notoriseSurveyDto.surveyType);
         });
     });
 
-    describe('save', () => {
-
-    })
 });

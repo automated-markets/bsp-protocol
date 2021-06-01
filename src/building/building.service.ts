@@ -1,16 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import EthUtil from '../ethereum/ethUtil';
+import EthereumUtil from '../ethereum/ethereumUtil';
 import { BuildingDto } from '../dto/building-dto';
-import { BuildingDataDto } from 'src/dto';
 
 @Injectable()
 export class BuildingService {
 
     async listAll(): Promise<Array<BuildingDto>> {
         try {
-            const instance = await EthUtil.getFactoryContract();
+            const instance = await EthereumUtil.getFactoryContract();
             const buildingAddresses = await instance.getAllBuildings();
-            let promises: Array<Promise<BuildingDto>> = buildingAddresses.map((buildingAddress: string) => EthUtil.getBuildingByAddress(buildingAddress));
+            let promises: Array<Promise<BuildingDto>> = buildingAddresses.map((buildingAddress: string) => EthereumUtil.getBuildingByAddress(buildingAddress));
             const buildings = await Promise.all(promises);
             return buildings;
 
@@ -22,7 +21,7 @@ export class BuildingService {
 
     async get(uprn: string): Promise<BuildingDto> {
         try {
-            const building = await EthUtil.getBuildingByUprn(uprn);
+            const building = await EthereumUtil.getBuildingByUprn(uprn);
             return building;
 
         } catch (error) {

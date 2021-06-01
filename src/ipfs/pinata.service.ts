@@ -1,6 +1,10 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 
+//import FormData from 'form-data';
+const FormData = require('form-data');
+import * as stream from 'stream';
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -141,4 +145,58 @@ const validatePinataOptions = (options) => {
     }
 }
 
-export default pinJSONToIPFS;
+const pinFileToIPFS = (readStream, options) => {
+    console.log("pinFileToIPFS");
+    validateApiKeys(pinataApiKey, pinataSecretApiKey);
+    
+    return new Promise((resolve, reject) => {
+        console.log("... pinning file");
+
+        const data = new FormData();
+        console.log("... adding file to form-data");
+        data.append('file', readStream);
+
+        const endpoint = `${baseUrl}/pinning/pinFileToIPFS`;
+        console.log("... using endpoint: " + endpoint);
+
+        if (!(readStream instanceof stream.Readable)) {
+            reject(new Error('readStream is not a readable stream'));
+        }
+
+        if (options) {
+            if (options.pinataMetadata) {
+                validateMetadata(options.pinataMetadata);
+                data.append('pinataMetadata', JSON.stringify(options.pinataMetadata));
+            }
+            if (options.pinataOptions) {
+                validatePinataOptions(options.pinataOptions);
+                data.append('pinataOptions', JSON.stringify(options.pinataOptions));
+            }
+        }
+
+        axios.post(
+            endpoint,
+            data,
+            {
+                withCredentials: true,
+                headers: {
+                    'Content-type': `multipart/form-data; boundary= ${data.getBoundary()}`,
+                    'pinata_api_key': pinataApiKey,
+                    'pinata_secret_api_key': pinataSecretApiKey
+                }
+            }).then(function (result) {
+            if (result.status !== 200) {
+                reject(new Error(`unknown server response while pinning File to IPFS: ${result}`));
+            }
+            resolve(result.data);
+        }).catch(function (error) {
+            //  handle error here
+            if (error && error.response && error.response.data && error.response.data.error) {
+                reject(new Error(error.response.data.error));
+            } else {
+                reject(error);
+            }
+        });
+    });
+}
+export default { pinJSONToIPFS, pinFileToIPFS };

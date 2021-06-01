@@ -3,4 +3,5 @@ export class BuildingDataDto {
     documentType: string;// "EWS"
     dataOriginator: string; //"0x0000000000000000000000000000000000000000"
     uri: string; //https://gateway.pinata.cloud/ipfs/Qmf7LhHA1kk1gELoD3QufK5QeSgpd2CgtDLRtkR5dapANG
+    timestamp: Date;
 }

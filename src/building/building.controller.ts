@@ -1,5 +1,6 @@
-import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Put, Param, Delete, Res } from '@nestjs/common';
 import { BuildingService } from './building.service';
+import { Response } from 'express';
 
 @Controller('/building')
 export class BuildingController {

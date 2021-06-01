@@ -21,6 +21,9 @@ contract BuildingDataFactory {
     mapping(bytes14 => address) buildingByUPRN; // map UPRN to the address of the associated Building contract instance.
     mapping(string => address) buildingDataByDocHash; // map document hash to the BuildingData a contract address
     
+    // Events
+    event SurveyRegistered(address buildingContractAddress, string documentHash, string docType, string timestamp, address originator);
+
     // Constructor
     constructor(address admin) {
         owner = admin;
@@ -94,7 +97,7 @@ contract BuildingDataFactory {
 
     /// @notice Tracks a element of building data against a building
     /// @return The address of the BuildingData contract created
-    function trackBuildingData(bytes14 uprn, string calldata documentHash, string calldata docType) public returns (address){
+    function trackBuildingData(bytes14 uprn, string calldata documentHash, string calldata docType, string calldata timestamp) public returns (address){
         // find or create the building 
         address buildingContractAddress = findOrCreateBuilding(uprn);        
         Building building = Building(buildingContractAddress);
@@ -106,7 +109,7 @@ contract BuildingDataFactory {
         } else {
             // doc hash never registered before, so create a new BuildingData contract
             BuildingData buildingData = new BuildingData(owner);
-            buildingData.initialize(buildingContractAddress, documentHash, docType, originator);
+            buildingData.initialize(buildingContractAddress, documentHash, docType, timestamp, originator);
 
             // register the BuildingData in the Building contracxt
             building.addBuildingData(buildingData); // track by building
@@ -114,6 +117,8 @@ contract BuildingDataFactory {
             address buildDataContractAddress = address(buildingData);
             allBuildingData.push(buildDataContractAddress); // track all BuildingData contracts ever created
             buildingDataByDocHash[documentHash] = buildDataContractAddress;
+
+            emit SurveyRegistered(buildingContractAddress, documentHash, docType, timestamp, originator);
 
             return buildDataContractAddress;
         }

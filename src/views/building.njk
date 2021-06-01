@@ -1,0 +1,236 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+{% block head %}
+    <link href="/assets/css/govuk-frontend-3.11.0.min.css" rel="stylesheet">
+    <style>
+      .red {
+        color: red;
+      }
+
+      .green {
+        color: green;
+      }
+
+      .centre {
+        display: block;
+        width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .grey {
+        background-color: #f3f2f1;
+      }
+
+      .padding30 {
+        padding: 30px 0px 10px;
+      }
+    </style>
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "#",
+    serviceName: "Building Passport Service",
+    serviceUrl: "#"
+  }) }}
+{% endblock %}
+
+{% block pageTitle %}GOV.UK - Building Passport Service{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: "experimental"
+    },
+    html: 'This is a new service – your <a class="govuk-link" href="#">feedback</a> will help us to improve it.'
+  }) }}
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Home",
+        href: "/ui/search"
+      },
+      {
+        text: "Buildings",
+        href: "/ui/search"
+      },
+      {
+        text: uprn,
+        href: "#"
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">UPRN - {{ uprn }}</h1>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l">Building status</h2>
+
+      {% set ews = '<span class="' + ewsContent.colour + '">' + ewsContent.icon + '</span>' %}
+      {% set ews1 = '<span class="' + ews1Content.colour + '">' + ews1Content.icon + '</span>' %}
+      {% set hhsrs = '<span class="' + hhsrsContent.colour + '">' + hhsrsContent.icon + '</span>' %}
+      {% set s106 = '<span class="' + s106Content.colour + '">' + s106Content.icon + '</span>' %}
+
+      {{ govukSummaryList({
+        classes: 'govuk-!-margin-bottom-9',
+        rows: [
+          {
+            key: { text: "EWS" },
+            value: { html: ews }
+          },
+          {
+            key: { text: "EWS1" },
+            value: { html: ews1 }
+          },
+          {
+            key: { text: "HHSRS" },
+            value: { html: hhsrs }
+          },
+          {
+            key: { text: "S106" },
+            value: { html: s106 }
+          }
+        ]
+      }) }}
+
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <h2 class="govuk-heading-l" id="subsection-title">
+        Building Passport
+      </h2>
+      <img class="centre" src="/assets/images/example-qr-code.png"/>
+      {% set issuanceInformation %}
+        <p class="govuk-body-s">
+          <strong>Passport ID:</strong></br>0x7617c40F00F8E93808952959d1A48CC5f29BbE96
+        </p>
+        <p class="govuk-body-s">
+          <strong>Date of issue:</strong></br>02 MAY 2021
+        </p>
+        <p class="govuk-body-s">
+          <strong>Date of expiry:</strong></br>01 MAY 2022
+        </p>
+        <p class="govuk-body-s">
+          <strong>Authority:</strong></br>MHCLG
+        </p>
+
+      {% endset %}
+
+      {{ govukDetails({
+        summaryText: 'Issuance details',
+        html: issuanceInformation
+      }) }}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row grey padding30">
+    <div class="govuk-grid-column-one-third">
+      <h2 class="govuk-heading-m" id="subsection-title">
+        Register building data
+      </h2>
+      <p class="govuk-body-m">Upload new surveys, documents and notices to the Building Passport Service to register them with this UPRN.</p>
+      {% set url = '/ui/notarise/' + uprn %}
+      {{ govukButton({
+        text: "Notarise document",
+        preventDoubleClick: true,
+        href: url
+      }) }}
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <h2 class="govuk-heading-m" id="subsection-title">
+        Validate new records
+      </h2>
+      <p class="govuk-body-m">Newly registered building data needs to be validated before before becoming part of a Building Passport.</p>
+      {{ govukButton({
+        text: "View unvalidated documents",
+        preventDoubleClick: true
+      }) }}
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <h2 class="govuk-heading-m" id="subsection-title">
+        Re-issue Building Passport
+      </h2>
+      <p class="govuk-body-m">When new information is registered, a new Building Passport may need to be issued.</p>
+      {{ govukButton({
+        text: "Issue new Building Passport",
+        preventDoubleClick: true
+      }) }}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row padding30">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l">Timeline</h2>
+    </div>
+  </div>
+
+  {% if buildingData.length === 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-s">No documents recorded for this building</h2>
+      </div>
+    </div>
+  {% else %}  
+    {% for buildingDataItem in buildingData %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <h2 class="govuk-heading-s">{{buildingDataItem.timestamp.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}}</h2>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukSummaryList({
+          classes: 'govuk-!-margin-bottom-9',
+          rows: [
+            {
+              key: { text: "Document type" },
+              value: { text: buildingDataItem.documentType },
+              actions: {
+                items: [{ href: buildingDataItem.uri, text: "View", visuallyHiddenText: "Survey document" }]
+              }
+            },
+            {
+              key: { text: "Originator" },
+              value: { text: buildingDataItem.dataOriginator }
+            },
+            {
+              key: { text: "Validator" },
+              value: { text: "Southwark Council" }
+            },
+            {
+              key: { text: "Timestamp" },
+              value: { text: buildingDataItem.timestamp }
+            },
+            {
+              key: { text: "Fingerprint" },
+              value: { text: buildingDataItem.documentHash }
+            }
+          ]
+        }) }}
+      </div>
+    </div>
+    {% endfor %}
+  {% endif %}
+{% endblock %}
+
+{% block bodyEnd %}
+  {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
+  <script src="/assets/js/govuk-frontend-3.11.0.min.js"></script>
+  <script>window.GOVUKFrontend.initAll()</script>
+{% endblock %}
